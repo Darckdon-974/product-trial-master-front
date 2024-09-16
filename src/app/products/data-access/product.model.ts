@@ -9,7 +9,7 @@ export interface Product {
     quantity: number;
     internalReference: string;
     shellId: number;
-    inventoryStatus: "INSTOCK" | "LOWSTOCK" | "OUTOFSTOCK" | null;
+    inventoryStatus: "INSTOCK" | "LOWSTOCK" | "OUTOFSTOCK";
     rating: number;
     createdAt: number;
     updatedAt: number;

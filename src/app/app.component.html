@@ -5,21 +5,56 @@
     <div class="p-toolbar-group-center">
         {{ title }}
     </div>
-    <div class="p-toolbar-group-end">
-        <i class="pi pi-shopping-cart" style="font-size: 2rem"></i>
+    <p-button (onClick)="op.toggle($event)" icon="pi pi-share-alt" label="Share" />
+    <div class="p-toolbar-group-end" (Click)="op.toggle($event)">
+        <i class="pi pi-shopping-cart" style="font-size: 1.4rem" pBadge>{{ getBadgeCount() }}</i>
     </div>
 </p-toolbar>
+<p-overlayPanel #op>
+    <ng-template pTemplate="content">
+        <p-table 
+            [value]="(cartItem$ | async) ?? []" 
+            [paginator]="true" 
+            [rows]="5" 
+            responsiveLayout="scroll">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="name">
+                            Name <p-sortIcon field="name" />
+                        </th>
+                        <th>Image</th>
+                        <th pSortableColumn="price">
+                            Price <p-sortIcon field="price" />
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData>
+                    <tr [pSelectableRow]="rowData">
+                        <td>{{ rowData.name }}</td>
+                        <td>
+                            <img 
+                                src="https://primefaces.org/cdn/primeng/images/demo/product/{{ rowData.image }}" 
+                                [alt]="rowData.image" 
+                                class="w-5rem shadow-2" />
+                        </td>
+                        <td>{{ rowData.price }}</td>
+                    </tr>                    
+                </ng-template>
+        </p-table>
+    </ng-template>
+</p-overlayPanel>
+
 <p-splitter 
-    [panelSizes]="[20, 80]" 
-    [style]="{ height: 'calc(100vh - 100px)' }">
-    <ng-template pTemplate>
-        <div class="w-full">
-            <app-panel-menu />
-        </div>
-    </ng-template>
-    <ng-template pTemplate>
-        <div class="w-full app-content">
-            <router-outlet></router-outlet>
-        </div>
-    </ng-template>
+[panelSizes]="[20, 80]" 
+[style]="{ height: 'calc(100vh - 100px)' }">
+<ng-template pTemplate>
+    <div class="w-full">
+        <app-panel-menu />
+    </div>
+</ng-template>
+<ng-template pTemplate>
+    <div class="w-full app-content">
+        <router-outlet></router-outlet>
+    </div>
+</ng-template>
 </p-splitter>
