@@ -10,8 +10,18 @@ export class CartService {
   public readonly items$ = this._items.asObservable();
 
   addToCart(item: Product) {
-    const updatedItems = [...this._items.value, item];
-    this._items.next(updatedItems);
+    const existingItem = this._items.value.find(i => i.code === item.code);
+    if(existingItem){
+      item.quantity = (item.quantity != null) ? item.quantity + 1 : 0;
+      const updatedItems = [...this._items.value, item];
+      console.log(updatedItems);
+      this._items.next(updatedItems);
+    }else {
+      const updatedItems = [...this._items.value, item];
+      console.log(updatedItems);
+      this._items.next(updatedItems);
+
+    }
   }
 
   getItems() {
