@@ -1,0 +1,13 @@
+:host >>> .contact-form {
+  width: 80%;
+}
+  
+:host >>> .p-inputtext {
+  width: 100%;
+}
+
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}

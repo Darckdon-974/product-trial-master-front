@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, inject, signal } from "@angular/core";
-import { CartService } from "app/products/data-access/cart.service";
-import { Product } from "app/products/data-access/product.model";
+import { ShoppingListService } from "app/products/data-access/shopping-list.service";
+import { Product, ShoppingList } from "app/products/data-access/product.model";
 import { ProductsService } from "app/products/data-access/products.service";
 import { ProductFormComponent } from "app/products/ui/product-form/product-form.component";
 import { ButtonModule } from "primeng/button";
@@ -9,6 +9,9 @@ import { CardModule } from "primeng/card";
 import { DataViewModule } from 'primeng/dataview';
 import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
+import { SelectItem } from "primeng/api";
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
 
 const emptyProduct: Product = {
   id: 0,
@@ -32,11 +35,21 @@ const emptyProduct: Product = {
   templateUrl: "./product-list.component.html",
   styleUrls: ["./product-list.component.scss"],
   standalone: true,
-  imports: [DataViewModule, CardModule, ButtonModule, DialogModule, ProductFormComponent, TagModule, CommonModule],
+  imports: [
+    DataViewModule, 
+    CardModule, 
+    ButtonModule, 
+    DialogModule, 
+    ProductFormComponent, 
+    TagModule, 
+    CommonModule, 
+    DropdownModule, 
+    FormsModule,
+  ],
 })
 export class ProductListComponent implements OnInit {
   private readonly productsService = inject(ProductsService);
-  private readonly cartService = inject(CartService);
+  private readonly shoppingListService = inject(ShoppingListService);
 
   public readonly products = this.productsService.products;
 
@@ -44,8 +57,30 @@ export class ProductListComponent implements OnInit {
   public isCreation = false;
   public readonly editedProduct = signal<Product>(emptyProduct);
 
+  sortOptions!: SelectItem[];
+
+  sortOrder!: number;
+
+  sortField!: string;
+
   ngOnInit() {
     this.productsService.get().subscribe();
+    this.sortOptions = [
+      { label: 'Prix ordre croissant', value: 'price' },
+      { label: 'Prix ordre decroissant', value: '!price' }
+    ];
+  }
+  
+  onSortChange(event: any) {
+    let value = event.value;
+
+    if (value.indexOf('!') === 0) {
+        this.sortOrder = -1;
+        this.sortField = value.substring(1, value.length);
+    } else {
+        this.sortOrder = 1;
+        this.sortField = value;
+    }
   }
 
   getSeverity (product: Product) {
@@ -84,7 +119,16 @@ export class ProductListComponent implements OnInit {
     if (this.isCreation) {
       this.productsService.create(product).subscribe();
     } else {
-      this.productsService.update(product).subscribe();
+      this.productsService.update(product.id, [
+        { "op": "replace", "path": "/name", "value": product.name },
+        { "op": "replace", "path": "/price", "value": product.price },
+        { "op": "replace", "path": "/description", "value": product.description },
+        { "op": "replace", "path": "/category", "value": product.category }
+      ]).subscribe(success => {
+        if (success) {
+          console.log("Product updated successfully");
+        }
+      });
     }
     this.closeDialog();
   }
@@ -97,7 +141,7 @@ export class ProductListComponent implements OnInit {
     this.isDialogVisible = false;
   }
 
-  public addProductToCart(product: Product){
-    this.cartService.addToCart(product);
+  public addProductToShoppingList(product: ShoppingList){
+    this.shoppingListService.addToShoppingList(product);
   }
 }

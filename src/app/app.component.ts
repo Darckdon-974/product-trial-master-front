@@ -6,7 +6,7 @@ import { RouterModule } from "@angular/router";
 import { SplitterModule } from 'primeng/splitter';
 import { ToolbarModule } from 'primeng/toolbar';
 import { PanelMenuComponent } from "./shared/ui/panel-menu/panel-menu.component";
-import { CartService } from "./products/data-access/cart.service";
+import { ShoppingListService } from "./products/data-access/shopping-list.service";
 import { Product } from "./products/data-access/product.model";
 import { Observable } from "rxjs";
 import { CommonModule } from '@angular/common';
@@ -29,23 +29,10 @@ import { CardModule } from "primeng/card";
   ],
 })
 export class AppComponent {
-  private readonly cartService = inject(CartService);
-  public numberCartItem: number = 0;
-  public readonly cartItem$: Observable<Product[]> = this.cartService.items$;
-  title = "ALTEN SHOP";
+  private readonly shoppingListService = inject(ShoppingListService);
+  public readonly title: string = "ALTEN SHOP";
 
-  
-  constructor() {
-    this.cartItem$.subscribe(items => {
-      this.numberCartItem = items.length;
-    });
-  }
-
-  getBadgeCount(){
-    return this.numberCartItem;
-  }
-
-  onDelete(product: Product){
-    this.cartService.removeItem(product.id);
+  getBadgeCount(): number {
+    return this.shoppingListService.numberOfProduct;
   }
 }

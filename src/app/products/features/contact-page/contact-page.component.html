@@ -1,0 +1,28 @@
+<h1 class="text-center">Contact</h1>
+
+<p-card styleClass="contact-form" class="flex justify-content-center">
+    <form [formGroup]="contactForm" (ngSubmit)="sendContact()" novalidate>
+        <div class="field">
+          <label for="email" class="block">Mail</label>
+          <input type="text" pInputText placeholder="Mail@mail.fr" formControlName="email" />
+          @if (contactForm.get('email')?.hasError('email') && contactForm.get('email')?.touched){
+            <small class="p-error block">
+                Invalid email format
+            </small>
+          }
+        </div>
+        <div class="field">
+          <label for="message" class="block">Message</label>
+          <textarea 
+            rows="5" 
+            cols="30" 
+            pInputTextarea
+            [autoResize]="true"
+            placeholder="Message"
+            formControlName="message">
+          </textarea>
+        </div>
+        <p-toast />
+        <button pButton type="submit" label="Submit" [disabled]="contactForm.invalid"></button>
+      </form>
+</p-card>

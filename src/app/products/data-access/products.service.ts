@@ -17,7 +17,7 @@ import { catchError, Observable, of, tap } from "rxjs";
     public get(): Observable<Product[]> {
         return this.http.get<Product[]>(this.path).pipe(
             catchError((error) => {
-                return this.http.get<Product[]>("assets/products.json");
+                return this.http.get<Product[]>("products.json");
             }),
             tap((products) => this._products.set(products)),
         );
@@ -32,14 +32,12 @@ import { catchError, Observable, of, tap } from "rxjs";
         );
     }
 
-    public update(product: Product): Observable<boolean> {
-        return this.http.patch<boolean>(`${this.path}/${product.id}`, product).pipe(
-            catchError(() => {
-                return of(true);
-            }),
+    public update(productId: number, patchOperations: any[]): Observable<boolean> {
+        return this.http.patch<boolean>(`${this.path}/${productId}`, patchOperations).pipe(
+            catchError(() => of(false)),
             tap(() => this._products.update(products => {
-                return products.map(p => p.id === product.id ? product : p)
-            })),
+                return products.map(p => p.id === productId ? { ...p, ...this.applyPatch(patchOperations, p) } : p);
+            }))
         );
     }
 
@@ -50,5 +48,17 @@ import { catchError, Observable, of, tap } from "rxjs";
             }),
             tap(() => this._products.update(products => products.filter(product => product.id !== productId))),
         );
+    }
+
+    private applyPatch(patchOperations: any[], product: Product): Partial<Product> {
+        const updatedProduct: Partial<Product> = { ...product };
+    
+        patchOperations.forEach(operation => {
+            const path = operation.path.slice(1) as keyof Product;
+            if (path in updatedProduct) {
+                updatedProduct[path] = operation.value;
+            }
+        });
+        return updatedProduct;
     }
 }
