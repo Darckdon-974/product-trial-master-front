@@ -124,11 +124,7 @@ export class ProductListComponent implements OnInit {
         { "op": "replace", "path": "/price", "value": product.price },
         { "op": "replace", "path": "/description", "value": product.description },
         { "op": "replace", "path": "/category", "value": product.category }
-      ]).subscribe(success => {
-        if (success) {
-          console.log("Product updated successfully");
-        }
-      });
+      ]).subscribe();
     }
     this.closeDialog();
   }
